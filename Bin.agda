@@ -93,7 +93,12 @@ to-from-id (Nat.suc n) rewrite (to-from-id n) | (toNat-suc (fromNat n)) | (to-fr
 --to-from-counterexample : Nat >< \n -> toNat (fromNat n) == n -> Zero
 
 from-to-counterexample : Bin >< \b -> fromNat (toNat b) == b -> Zero
-from-to-counterexample = {!!}
+--from-to-counterexample = {! Lib.Sigma._><_._,_!}
+--from-to-counterexample = {!_><_._,_ (end O) (\b -> fromNat (toNat b) == b)!}
+from-to-counterexample = (end O) , \ x -> {!x!}
+--from-to-counterexample = (end O), (\b -> fromNat (toNat b) == b -> Zero)
+--from-to-counterexample = (end O),  (fromNat (toNat (end O)) == (end O))
+
 --from-to-counterexample (end O) ()
 --free-to-conterexample (freeNat (toNat (end O))) == end O
 
@@ -108,8 +113,10 @@ data Can : Bin -> Set where
 
 suc-LeadingOne : (b : Bin) -> LeadingOne b -> LeadingOne (suc b)
 suc-LeadingOne .(end I) endI = endI O
-suc-LeadingOne .(_ O) (b O) = b I
-suc-LeadingOne .(_ I) (b I) = {!b!}
+suc-LeadingOne .(_ O) (x O) = x I
+suc-LeadingOne (b I) (x I) = {!(LeadingOne (suc b I)) O!}
+--suc-LeadingOne (x I) (b I) with LeadingOne (suc (x I))
+--... | z = {!z!}
 --suc-LeadingONe .(x I) ({x} b I) = ?
 --suc-LeadingOne .(b I) ({b} (LeadingOne b) I) = ?
 --suc-LeadingOne .(_ I) (b I) = (suc b) O
@@ -120,7 +127,11 @@ suc-LeadingOne .(_ I) (b I) = {!b!}
 
 suc-Can : (b : Bin) -> Can b -> Can (suc b)
 suc-Can .(end) end = leadingOne (endI)
---suc-Can .(leadingOne (b O))
+suc-Can (b O) (leadingOne x) with (suc-LeadingOne (b O) x)
+... | z = leadingOne z
+suc-Can (b I) (leadingOne x) with (suc-LeadingOne (b I) x)
+... | z = {!leadingOne z!}
+--suc-Can (leadingOne (b O))
 
 
 
@@ -198,12 +209,18 @@ fromNat-+N-+B-commutes (Nat.suc n) (Nat.suc m) rewrite (Nat.+N-right-suc n m) | 
 
 +B-same-shift : (b : Bin) -> LeadingOne b -> b +B b == b O
 +B-same-shift .(end I) endI = refl
-+B-same-shift .(_ O) (b O) = {!ap (Bin._O)!}
++B-same-shift (b O) (x O) = ap _O (+B-same-shift b x)
++B-same-shift (b I) (x I) rewrite (+B-right-suc b b) | (+B-same-shift b x) = refl
+--+B-same-shift (b I) (x I) rewrite (+B-right-suc b b) = {!ap Bin._O (+B-same-shift (suc b O) ((suc b) O))!}
+--+B-same-shift (b O) = {!ap (Bin._O) (+B-same-shift b == (b O))!}
 --+B-same-shift (b O) = {!ap (Bin._O) (+B-same-shift b == (b O))!}
 --+B-same-shift (b O) = {!cong Bin._O (+B-same-shift b)!}
 --+B-same-shift (b I) = {!+B-same-shift b!}
 
 from-to-id-Can : (b : Bin) -> Can b -> fromNat (toNat b) == b
 from-to-id-Can .(end) end = refl
---from-to-id-Can .(_)   
+from-to-id-Can (b O) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b)  (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
+from-to-id-Can (b I) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b)  (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
+
+--from-to-id-Can (b I) (leadingOne x) rewrite (from-to-id-Can b _) = {!!}
 --from-to-id-Can (b O)
