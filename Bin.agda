@@ -9,6 +9,7 @@ open import Lib.Sigma
 open import Lib.Zero
 open import Lib.One
 
+
 data Bin : Set where
   end : Bin
   _O : Bin -> Bin
@@ -95,7 +96,8 @@ to-from-id (Nat.suc n) rewrite (to-from-id n) | (toNat-suc (fromNat n)) | (to-fr
 from-to-counterexample : Bin >< \b -> fromNat (toNat b) == b -> Zero
 --from-to-counterexample = {! Lib.Sigma._><_._,_!}
 --from-to-counterexample = {!_><_._,_ (end O) (\b -> fromNat (toNat b) == b)!}
-from-to-counterexample = (end O) , \ x -> {!x!}
+--from-to-counterexample = (end O) , \ x -> {!x!}
+from-to-counterexample = (end O) , \ ()
 --from-to-counterexample = (end O), (\b -> fromNat (toNat b) == b -> Zero)
 --from-to-counterexample = (end O),  (fromNat (toNat (end O)) == (end O))
 
@@ -222,10 +224,17 @@ fromNat-+N-+B-commutes (Nat.suc n) (Nat.suc m) rewrite (Nat.+N-right-suc n m) | 
 --+B-same-shift (b O) = {!cong Bin._O (+B-same-shift b)!}
 --+B-same-shift (b I) = {!+B-same-shift b!}
 
+
+--revSideLeadingOne : {b : Bin} -> LeadingOne (b O) -> LeadingOne b
+--revSideLeadingOne {b} x rewrite (LeadingOne._O ?) = {!!}
+
+
 from-to-id-Can : (b : Bin) -> Can b -> fromNat (toNat b) == b
 from-to-id-Can .(end) end = refl
-from-to-id-Can (b O) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b)  (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
-from-to-id-Can (b I) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b)  (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
+--from-to-id-Can (b O) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) = {!!}
+from-to-id-Can (b O) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
+--from-to-id-Can (b I) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
+from-to-id-Can (b I) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
 
 --from-to-id-Can (b I) (leadingOne x) rewrite (from-to-id-Can b _) = {!!}
 --from-to-id-Can (b O)
