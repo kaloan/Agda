@@ -231,10 +231,10 @@ fromNat-+N-+B-commutes (Nat.suc n) (Nat.suc m) rewrite (Nat.+N-right-suc n m) | 
 
 from-to-id-Can : (b : Bin) -> Can b -> fromNat (toNat b) == b
 from-to-id-Can .(end) end = refl
+from-to-id-Can .(end I) (leadingOne endI) = refl
 --from-to-id-Can (b O) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) = {!!}
-from-to-id-Can (b O) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
+from-to-id-Can (b O) (leadingOne (x O)) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b (leadingOne x) ) | (+B-same-shift b x ) = refl
 --from-to-id-Can (b I) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
-from-to-id-Can (b I) (leadingOne x) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b _ ) | (+B-same-shift b _ ) = refl
-
+from-to-id-Can (b I) (leadingOne (x I)) rewrite (fromNat-+N-+B-commutes (toNat b) (toNat b)) | (from-to-id-Can b (leadingOne x) ) | (+B-same-shift b x ) = refl
 --from-to-id-Can (b I) (leadingOne x) rewrite (from-to-id-Can b _) = {!!}
 --from-to-id-Can (b O)
