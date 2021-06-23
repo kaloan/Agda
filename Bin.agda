@@ -114,7 +114,8 @@ data Can : Bin -> Set where
 suc-LeadingOne : (b : Bin) -> LeadingOne b -> LeadingOne (suc b)
 suc-LeadingOne .(end I) endI = endI O
 suc-LeadingOne .(_ O) (x O) = x I
-suc-LeadingOne (b I) (x I) = {!(LeadingOne (suc b I)) O!}
+suc-LeadingOne (b I) (x I) with (suc-LeadingOne b x)
+... | z = z O
 --suc-LeadingOne (x I) (b I) with LeadingOne (suc (x I))
 --... | z = {!z!}
 --suc-LeadingONe .(x I) ({x} b I) = ?
@@ -130,14 +131,18 @@ suc-Can .(end) end = leadingOne (endI)
 suc-Can (b O) (leadingOne x) with (suc-LeadingOne (b O) x)
 ... | z = leadingOne z
 suc-Can (b I) (leadingOne x) with (suc-LeadingOne (b I) x)
-... | z = {!leadingOne z!}
+... | z = leadingOne z
 --suc-Can (leadingOne (b O))
 
 
 
 
 fromNat-Can : (n : Nat) -> Can (fromNat n)
-fromNat-Can = {!!}
+fromNat-Can Nat.zero = end
+--fromNat-Can (Nat.suc n) rewrite (suc-Can (fromNat n) (fromNat-Can n)) = ?
+fromNat-Can (Nat.suc n) = suc-Can (fromNat n) (fromNat-Can n) 
+--fromNat-Can (Nat.suc n) = {!suc-Can (fromNat n) (leadingOne (LeadingOne (fromNat n)))!}
+
 
 _+B_ : Bin -> Bin -> Bin
 --_+B_ x y = fromNat(toNat x +N toNat y)
