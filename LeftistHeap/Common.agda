@@ -41,7 +41,10 @@ min : Nat -> Nat -> Nat
 min zero zero = zero
 min zero (suc y) = zero
 min (suc x) zero = zero
-min (suc x) (suc y) = min x y
+min (suc x) (suc y) = suc (min x y)
+
+_ : min 3 5 == 3
+_ = refl
 
 LeqSuc : (n : Nat) -> Leq n (suc n)
 LeqSuc zero = <>
@@ -51,9 +54,10 @@ min-Leq-left : (n m : Nat) -> Leq (min n m) n
 min-Leq-left zero zero = <>
 min-Leq-left zero (suc m) = <>
 min-Leq-left (suc n) zero = <>
-min-Leq-left (suc n) (suc m) with (min-Leq-left n m)
-... | z with (min n m)
-... | minn = Leq-trans minn n (suc n) z (LeqSuc n)
+min-Leq-left (suc n) (suc m) = min-Leq-left n m
+--min-Leq-left (suc n) (suc m) with (min-Leq-left n m)
+--... | z with (min n m)
+--... | minn = Leq-trans minn n (suc n) z (LeqSuc n)
 
 min-right-zero : (m : Nat) -> min m zero == zero
 min-right-zero zero = refl
@@ -63,7 +67,8 @@ min-symm : (n m : Nat) -> min n m == min m n
 min-symm zero zero  = refl
 min-symm (suc n) zero  = refl
 min-symm zero (suc m)  = refl
-min-symm (suc n) (suc m)  = min-symm n m
+min-symm (suc n) (suc m) rewrite (min-symm n m) = refl
+--min-symm (suc n) (suc m)  = min-symm n m
 
 
 min-Leq-right : (n m : Nat) -> Leq (min n m) m
