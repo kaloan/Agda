@@ -45,13 +45,17 @@ mkNode {lower} p proof first second with (decLeq (rank first) (rank second))
 merge :
   {lower : Priority} ->
   Heap lower -> Heap lower -> Heap lower
-merge = {!!}
+merge {lower} empty empty = empty {lower}
+merge {lower} first empty = first
+merge {lower} empty second = second
+--merge {lower} first@(node {lower} {pFL} {pFR} rF lower fL fR) second@(node {lower} {pSL} {pSR} rS lower sL sR) = ?
 
 singleton : {lower : Priority} (x : Priority) -> Leq lower x -> Heap lower
 singleton {lower} x proof = node {lower} {x} {x} 0 lower empty empty
 
-weakenHeap : (n m : Priority) -> Leq n m -> Heap {!!} -> Heap {!!}
-weakenHeap = {!!}
+weakenHeap : (n m : Priority) -> Leq n m -> Heap n -> Heap m
+weakenHeap n m proof empty = empty {m}
+weakenHeap n m proof (node {pL} {pR} r p left right) = node {m} r p left right 
 
 insert : {lower : Priority} (x : Priority) -> Heap lower -> Heap lower
 insert {lower} x given = {!merge!}
