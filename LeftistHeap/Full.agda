@@ -29,13 +29,15 @@ singleton : (p x : Priority) -> Leq p x -> Heap p 1
 singleton p x proof = node {p} {x} {x} p empty empty 
 
 insert : {r : Rank} {p : Priority} (x : Priority) -> Heap p r -> Heap (min p x) (suc r)
-insert {p} x given = {!merge (singleton x) given!}
+--insert {r} {p} x given = merge {!!} {!given!}
+--insert {r} {p} x given = {!merge (singleton (min p x) x) given!}
 
-findMin : {p : Priority} {r : Rank} -> Heap p {!!} -> Priority
-findMin = {!!}
+
+findMin : {p : Priority} {r : Rank} -> Heap p (suc r) -> Priority
+findMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = {!p2!}
 
 delMin : {p : Priority} {r : Rank} -> Heap p (suc r) -> Heap p r
-delMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = {!merge {rL} {rR} {pR} left right!}
+delMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = {!merge {rL} {rR} {pL} left right!}
 
 minimum : List Priority -> Priority
 minimum [] = zero

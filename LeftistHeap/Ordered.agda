@@ -48,20 +48,26 @@ merge :
 merge {lower} empty empty = empty {lower}
 merge {lower} first empty = first
 merge {lower} empty second = second
---merge {lower} first@(node {lower} {pFL} {pFR} rF lower fL fR) second@(node {lower} {pSL} {pSR} rS lower sL sR) = ?
+--merge {lower} first@(node {pFL} {pFR} rankF pF lF rF) second@(node {pSL} {pSR} rankS pS lS rS) with (decLeq pF pS)
+merge {lower} first@(node {pFL} {pFR} rankF pF lF rF) second@(node {pSL} {pSR} rankS pS lS rS) with (decLeq pF pS)
+... | inl pFSmaller = {!mkNode {lower} lower (Leq-refl lower) lF!}
+... | inr pSSmaller = {!mkNode {lower} lower (Leq-refl lower) lS!}
 
 singleton : {lower : Priority} (x : Priority) -> Leq lower x -> Heap lower
-singleton {lower} x proof = node {lower} {x} {x} 0 lower empty empty
+singleton {lower} x proof = node {lower} {x} {x} 1 lower empty empty
 
-weakenHeap : (n m : Priority) -> Leq n m -> Heap n -> Heap m
-weakenHeap n m proof empty = empty {m}
-weakenHeap n m proof (node {pL} {pR} r p left right) = node {m} r p left right 
+weakenHeap : (n m : Priority) -> Leq n m -> Heap m -> Heap n
+weakenHeap n m proof empty = empty {n}
+weakenHeap n m proof (node {pL} {pR} r p left right) = node {n} r p left right 
 
-insert : {lower : Priority} (x : Priority) -> Heap lower -> Heap lower
-insert {lower} x given = {!merge!}
+insert : {lower : Priority} (x : Priority) -> Heap lower -> Heap (min lower x)
+insert {lower} x given
+  = merge (singleton {min lower x} x (min-Leq-right lower x)) (weakenHeap (min lower x) lower (min-Leq-left lower x) given)
 
 findMin : {lower : Priority} -> Heap lower -> Maybe Priority
-findMin = {!!}
+findMin empty = no
+findMin (node rankN p left right) = yes p
 
 delMin : {lower : Priority} -> Heap lower -> Maybe (Heap lower)
-delMin = {!!}
+delMin empty = no
+--delMin (node rankN p left right) = yes (merge left right)
