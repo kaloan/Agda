@@ -22,8 +22,9 @@ mkNode {lr} {rr} {b} p proof first second with (decLeq lr rr)
 merge : {lr rr : Rank} {p : Priority} -> Heap p lr -> Heap p rr -> Heap p (suc (lr +N rr))
 merge = {!!}
 
-weakenHeap : {r : Rank} (n m : Priority) -> Leq n m -> Heap {!!} r -> Heap {!!} r
-weakenHeap = {!!}
+weakenHeap : {r : Rank} (n m : Priority) -> Leq n m -> Heap m r -> Heap n r
+weakenHeap {r} n m proof empty = empty
+weakenHeap {r} n m proof (node {pL} {pR} {rL} {rR} p left right) = node {n} {pL} {pR} {rL} {rR} p left right
 
 singleton : (p x : Priority) -> Leq p x -> Heap p 1
 singleton p x proof = node {p} {x} {x} p empty empty 
@@ -34,10 +35,10 @@ insert : {r : Rank} {p : Priority} (x : Priority) -> Heap p r -> Heap (min p x) 
 
 
 findMin : {p : Priority} {r : Rank} -> Heap p (suc r) -> Priority
-findMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = {!p2!}
+findMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = p2
 
 delMin : {p : Priority} {r : Rank} -> Heap p (suc r) -> Heap p r
-delMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = {!merge {rL} {rR} {pL} left right!}
+--delMin {p} (node {pL} {pR} {rL} {rR} p2 left right) = {!merge {rL} {rR} {pL} left right!}
 
 minimum : List Priority -> Priority
 minimum [] = zero
