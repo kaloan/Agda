@@ -12,37 +12,39 @@ open import Lib.Eq
 -- type index, since we will need it to vary for the different constructors
 data Heap : Rank -> Set where
   empty : Heap 0
-  node : {r1 r2 : Rank} -> Priority -> Heap r1 -> Heap r2 -> Heap (suc (r1 +N r2)) 
+  node : {r1 r2 : Rank} -> Leq r2 r1 -> Priority -> Heap r1 -> Heap r2 -> Heap (suc (r1 +N r2)) 
 
 --Долното не работи, както и трябва
 --wrongRank : Heap 1337
---wrongRank = node 0 empty empty
+--wrongRank = node <> 0 empty empty
 
 rightWrongRank : Heap 1
-rightWrongRank = node 0 empty empty
+rightWrongRank = node <> 0 empty empty
 
---Това май би трябвало да е така, с mkNode се грижим свойството на ранга да е в сила
-wrongRankProp : Heap 2
-wrongRankProp = node 0 empty (node 5 empty empty)
+--Долното не работи, както и трябва
+--wrongRankProp : Heap 2
+--wrongRankProp = node <> 0 empty (node 5 empty empty)
 
 
 rightPriority : Heap 3
-rightPriority = node 5 (node 10 empty empty) (node 6 empty empty)
+rightPriority = node <> 5 (node <> 10 empty empty) (node <> 6 empty empty)
 
 wrongPriority : Heap 2
-wrongPriority = node 5 (node 1 empty empty) empty 
+wrongPriority = node <> 5 (node <> 1 empty empty) empty 
 
 
 rank : {r : Rank} -> Heap r -> Rank
 rank {.0} empty = zero 
-rank {r} (node p left right) = r
+rank {r} (node p _ left right) = r
 
 mkNode :
   {lr rr : Rank} ->
   Priority -> Heap lr -> Heap rr -> Heap (suc (lr +N rr))
-mkNode {lr} {rr} p first second with decLeq (rank first) (rank second)
-... | inl firstSmallerRank rewrite (+N-commut lr rr) = node p second first
-... | inr secondSamllerRank = node p first second
+mkNode {lr} {rr} p first second with decLeq lr rr
+... | inl firstSmallerRank rewrite (+N-commut lr rr) = node firstSmallerRank p second first
+--node p second first
+... | inr secondSamllerRank = node secondSamllerRank p first second
+--node p first second
 
 
 
@@ -50,9 +52,10 @@ mkNode {lr} {rr} p first second with decLeq (rank first) (rank second)
 merge :
   {lr rr : Rank} ->
   Heap lr -> Heap rr -> Heap (lr +N rr)
-merge {rr} empty second = second
+merge {.0} {.0} empty empty = empty
+merge {.0} {rr} empty second = second
 merge {lr} first empty rewrite (+N-right-zero lr) = first
-merge {ll} {rr} first@(node {rLF} {rRF} pF lF rF) second@(node {rLS} {rRS} pS lS rS) with (decLeq pF pS)
+merge {ll} {rr} first@(node {rLF} {rRF} proofF pF lF rF) second@(node {rLS} {rRS} proofS pS lS rS) with (decLeq pF pS)
 ... | inl pFSmaller rewrite (+N-assoc rLF rRF (suc (rLS +N rRS))) = mkNode pF lF (merge rF second)
 ... | inr pSSmaller rewrite (+N-right-suc (rLF +N rRF) (rLS +N rRS))
     | (+N-commut (rLF +N rRF) (rLS +N rRS))
@@ -60,16 +63,18 @@ merge {ll} {rr} first@(node {rLF} {rRF} pF lF rF) second@(node {rLS} {rRS} pS lS
     | (==-symm (+N-right-suc rLS (rRS +N rLF +N rRF)))
     | (==-symm (+N-right-suc rRS (rLF +N rRF)))
     = mkNode pS lS (merge rS first)
+    
 
 
 singleton : Priority -> Heap 1
-singleton p = node p empty empty
+singleton p = node <> p empty empty
+
 
 insert : {r : Rank} -> Priority -> Heap r -> Heap (suc r)
 insert {r} p given = merge (singleton p) given
 
 findMin : {r : Rank} -> Heap (suc r) -> Priority
-findMin (node p _ _) = p
+findMin (node _ p _ _) = p
 
 delMin : {r : Rank} -> Heap (suc r) -> Heap r
-delMin (node p left right) = merge left right
+delMin (node _ p left right) = merge left right

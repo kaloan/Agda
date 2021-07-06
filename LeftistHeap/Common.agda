@@ -38,10 +38,14 @@ data Maybe (A : Set) : Set where
   yes : A -> Maybe A
 
 min : Nat -> Nat -> Nat
-min zero zero = zero
-min zero (suc y) = zero
-min (suc x) zero = zero
-min (suc x) (suc y) = suc (min x y)
+--min zero zero = zero
+--min zero (suc y) = zero
+--min (suc x) zero = zero
+--min (suc x) (suc y) = suc (min x y)
+min n m with (decLeq n m)
+... | inl nSmaller = n
+... | inr mSmaller = m
+
 
 _ : min 3 5 == 3
 _ = refl
@@ -54,22 +58,30 @@ min-Leq-left : (n m : Nat) -> Leq (min n m) n
 min-Leq-left zero zero = <>
 min-Leq-left zero (suc m) = <>
 min-Leq-left (suc n) zero = <>
-min-Leq-left (suc n) (suc m) = min-Leq-left n m
---min-Leq-left (suc n) (suc m) with (min-Leq-left n m)
---... | z with (min n m)
---... | minn = Leq-trans minn n (suc n) z (LeqSuc n)
+--min-Leq-left (suc n) (suc m) = min-Leq-left n m
+min-Leq-left (suc n) (suc m) with (decLeq (suc n) (suc m))
+... | inl nSmaller = Leq-refl n
+... | inr mSmaller = mSmaller
 
 min-right-zero : (m : Nat) -> min m zero == zero
 min-right-zero zero = refl
 min-right-zero (suc m) = refl 
 
+Leq-both-same : (n m : Nat) -> Leq n m -> Leq m n -> n == m
+Leq-both-same zero zero proofL proofR = refl
+Leq-both-same (suc n) (suc m) proofL proofR = ap suc (Leq-both-same n m proofL proofR)
+
+
 min-symm : (n m : Nat) -> min n m == min m n
 min-symm zero zero  = refl
 min-symm (suc n) zero  = refl
 min-symm zero (suc m)  = refl
-min-symm (suc n) (suc m) rewrite (min-symm n m) = refl
---min-symm (suc n) (suc m)  = min-symm n m
-
+--min-symm (suc n) (suc m) rewrite (min-symm n m) = refl
+min-symm (suc n) (suc m) with (decLeq n m) | (decLeq m n)
+... | inl nSmaller1 | inr nSmaller2 = refl
+... | inr mSmaller2 | inl mSmaller1 = refl
+... | inl nSmaller1 | inl mSmaller2 = ap suc (Leq-both-same n m nSmaller1 mSmaller2)
+... | inr mSmaller1 | inr nSmaller2 = {!ap suc (Leq-both-same m n mSmaller1 nSmaller2)!}
 
 min-Leq-right : (n m : Nat) -> Leq (min n m) m
 min-Leq-right n m rewrite (min-symm n m) = min-Leq-left m n
