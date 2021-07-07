@@ -55,9 +55,11 @@ delMin {p} (node {rL} {rR} p2 _ proofP left right) = merge {rL} {rR} (weakenHeap
 
 minimum : List Priority -> Priority
 minimum [] = zero
+minimum (x ,- []) = x
 minimum (x ,- xs) = min x (minimum xs)
 
 fromList : (xs : List Priority) -> Heap (minimum xs) (length xs)
 fromList [] = empty {zero}
-fromList (x ,- xs) rewrite (min-symm x (minimum xs)) = insert x (fromList xs)
+fromList (x ,- []) = singleton x x (Leq-refl x)
+fromList (x ,- y ,- xs) rewrite (min-symm x (minimum (y ,- xs))) = insert x (fromList (y ,- xs))
 
