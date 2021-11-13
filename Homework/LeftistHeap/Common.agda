@@ -85,3 +85,7 @@ min-symm (suc n) (suc m) with (decLeq n m) | (decLeq m n)
 
 min-Leq-right : (n m : Nat) -> Leq (min n m) m
 min-Leq-right n m rewrite (min-symm n m) = min-Leq-left m n
+
+leqLeqIsEq : (n m : Nat) -> Leq n m -> Leq m n -> n == m
+leqLeqIsEq zero zero nLm mLn = refl
+leqLeqIsEq (suc n) (suc m) nLm mLn rewrite (leqLeqIsEq n m nLm mLn) = refl
